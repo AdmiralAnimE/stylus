@@ -216,8 +216,13 @@ function applyStyles(styles) {
     docHeadObserver = new MutationObserver(() => {
       docHeadObserver.disconnect();
       docHeadObserver = null;
+      const resetCSSOMcache = navigator.userAgent.includes('Firefox/55');
       for (const el of styleElements.values()) {
         ROOT.insertBefore(el, document.body);
+        // TODO: remove in the future when it's fixed in FF or we don't care
+        if (resetCSSOMcache) {
+          el.textContent += ' '; // invalidate CSSOM cache to circumvent FF bug
+        }
       }
     });
     docHeadObserver.observe(ROOT, {childList: true});
